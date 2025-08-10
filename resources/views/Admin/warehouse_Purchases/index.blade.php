@@ -1,0 +1,75 @@
+@extends('admin.layouts.app')
+
+@section('title', 'فواتير المشتريات')
+
+@section('content')
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>إدارة مشتريات المستودع</h2>
+        <a href="{{route('warehousePurchases.create')}}" class="btn btn-primary">
+            <i class="fas fa-plus ml-1"></i>
+            إضافة فاتورة جديدة
+        </a>
+    </div>
+
+    <form action="" method="GET" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="ابحث عن الطبيب..." value="{{ request('search') }}">
+            <button class="btn btn-outline-secondary" type="submit">
+                <i class="fas fa-search"></i> بحث
+            </button>
+            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
+    </form>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">فواتير المشتريات</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المستودع</th>
+                        <th>تاريخ الشراء</th>
+                        <th>عدد الأصناف</th>
+                        <th>الإجمالي</th>
+                        <th>ملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($purchases as $purchase)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $purchase->storehouse->name ?? '-' }}</td>
+                            <td>{{ $purchase->purchase_date }}</td>
+                            <td>{{ $purchase->items->count() }}</td>
+                            <td>{{ number_format($purchase->total_amount, 2) }}</td>
+                            <td>{{ $purchase->notes ?? '-' }}</td>
+                            <td>
+                                <a href="{{ route('warehousePurchases.show', $purchase->id) }}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ route('warehousePurchases.edit', $purchase->id) }}" class="btn btn-sm btn-warning" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{route('warehousePurchases.destroy', $purchase->id) }}" method="POST" class="delete-form" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger delete-university" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@endsection
