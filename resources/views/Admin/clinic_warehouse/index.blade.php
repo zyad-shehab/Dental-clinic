@@ -10,8 +10,8 @@
     </div>
 
     <form action="" method="GET" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="ابحث عن الطبيب..." value="{{ request('search') }}">
+        <div class="input-group on-print">
+            <input type="text" name="search" class="form-control" placeholder="ابحث عن الصنف..." value="{{ request('search') }}">
             <button class="btn btn-outline-secondary" type="submit">
                 <i class="fas fa-search"></i> بحث
             </button>
@@ -20,7 +20,7 @@
             </a>
         </div>
     
-    <div class="row g-2 align-items-end">
+    <div class="row g-2 align-items-end on-print">
         <div class="col-md-3">
             <hr>
             {{-- <label>تصفية حسب الحالة:</label> --}}
@@ -38,7 +38,7 @@
 
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">فواتير المشتريات</h5>
+            <h5 class="mb-0">اصناف المستودع</h5>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-hover">
@@ -49,7 +49,7 @@
                         <th>الكمية</th>
                         <th>تاريخ الانتهاء</th>
                         <th>الحالة</th>
-                        <th>الإجراء</th>
+                        <th class="on-print">الإجراء</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,7 +81,7 @@
         @endif
     </td>
     <td>
-        <form action="{{ route('clinic_warehouse.toggle_status', $item->id) }}" method="POST">
+        <form class="on-print" action="{{ route('clinic_warehouse.toggle_status', $item->id) }}" method="POST">
             @csrf
             <button type="submit" class="btn btn-sm btn-warning">تغيير الحالة</button>
         </form>
@@ -93,6 +93,12 @@
                     @endforelse
                 </tbody>
             </table>
+            <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
+            <div class="d-flex justify-content-center on-print">
+                        {{ $items->links() }}
+            </div> 
         </div>
     </div>
 </div>

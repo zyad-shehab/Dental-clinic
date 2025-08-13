@@ -44,8 +44,8 @@
                 </tfoot>
             </table>
             <a href="#" onclick="window.print()" class="btn btn-light btn-sm">
-    <i class="fas fa-print"></i> طباعة
-</a>
+                <i class="fas fa-print"></i> طباعة
+            </a>
         </div>
     </div>
 </div>

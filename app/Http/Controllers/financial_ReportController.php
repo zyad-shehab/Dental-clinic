@@ -136,7 +136,7 @@ public function getCashBox(Request $request){
         ->where('paid_cash', '>', 0)
         ->get();
 
-    // دفعات مختبر نقدية
+    // دفعات معمل نقدية
     $lab_cash_details = lab_PaymentModel::with('laboratories')
         ->whereBetween('payment_date', [$from, $to])
         ->where('paid_cash', '>', 0)

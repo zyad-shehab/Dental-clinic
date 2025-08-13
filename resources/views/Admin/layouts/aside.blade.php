@@ -23,7 +23,7 @@
 }
 </style>
 
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar on-print">
         <div class="sidebar-header">
             <h3>لوحة التحكم</h3>
         </div>
@@ -35,6 +35,7 @@
                     الرئيسية
                 </a>
             </li>
+            @if(auth()->check() && auth()->user()->type === 'admin')
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.secretary.index','admin.secretary.create','admin.secretary.edit','admin.secretary.show','admin.doctor.index','admin.doctor.create','admin.doctor.edit','admin.doctor.show') ? 'active' : '' }}" href="{{route('admin.secretary.index')}}" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
                     <i class="fas fa-users ml-2"></i>الموظفين
@@ -52,6 +53,7 @@
                     </li>
                 </ul> 
             </li>
+            @endif
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle {{ request()->routeIs('appointments.index','appointments.create','appointments.edit','appointments.show','sessions.index','sessions.create','sessions.edit','sessions.show','patientPayment.index','patientPayment.create','patientPayment.edit','patientPayment.show','admin.patients.index','admin.patients.create','admin.patients.edit','admin.patients.show','patients.statement') ? 'active' : '' }}" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
                     <i class="fas fa-users ml-2"></i>المرضي
@@ -94,6 +96,7 @@
                             <i class="fa-solid fa-user-tie ml-2"></i>طلبات المعمل
                         </a>
                     </li> 
+                    @if(auth()->check() && auth()->user()->type === 'admin')
                     <li>
                         <a href="{{route('laboratoryPurchases.index')}}" class="dropdown-item {{ request()->routeIs('laboratoryPurchases.index','laboratoryPurchases.create','laboratoryPurchases.edit','laboratoryPurchases.show') ? 'active' : '' }}">
                             <i class="fa-solid fa-user-tie ml-2"></i> فواتير الشراء
@@ -109,8 +112,10 @@
                             <i class="fa-solid fa-user-tie ml-2"></i>  تفاصيل المعامل 
                         </a>
                     </li>
+                    @endif
                 </ul> 
             </li>
+            @if(auth()->check() && auth()->user()->type === 'admin')
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle {{ request()->routeIs('warehousePurchases.index','warehousePurchases.create','warehousePurchases.edit','warehousePurchases.show','warehousepayment.index','warehousepayment.create','warehousepayment.edit','warehousepayment.show','storehouse.index','storehouse.create','storehouse.edit','storehouse.show','storehouse.statement') ? 'active' : '' }}" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
                     <i class="fas fa-users ml-2"></i>المستودعات
@@ -133,6 +138,7 @@
                     </li>
                 </ul> 
             </li>
+            @endif
             <li>
                 <a href="{{route('clinic_warehouse.index')}}" class="{{ request()->routeIs('clinic_warehouse.index') ? 'active' : '' }}">
                    <i class="fa-solid fa-user-doctor ml-2"></i>
@@ -144,6 +150,7 @@
                     <i class="fas fa-users ml-2"></i>المالية
                 </a>
                 <ul class="dropdown-menu custom-dropdown" aria-labelledby="servicesDropdown">
+                    @if(auth()->check() && auth()->user()->type === 'admin')
                     <li>
                         <a href="{{route('Report.getReport')}}" class="dropdown-item {{ request()->routeIs('Report.getReport') ? 'active' : '' }}">
                             <i class="fa-solid fa-user-tie ml-2"></i>تقارير
@@ -164,6 +171,7 @@
                             <i class="fa-solid fa-user-tie ml-2"></i>حساب البنك
                         </a>
                     </li>
+                    @endif
                     <li>
                         <a href="{{route('Report.patientsDebtsSummary')}}" class="dropdown-item {{ request()->routeIs('Report.patientsDebtsSummary') ? 'active' : '' }}">
                             <i class="fa-solid fa-user-tie ml-2"></i>ديون المرضى 

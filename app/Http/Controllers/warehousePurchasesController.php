@@ -12,10 +12,34 @@ class warehousePurchasesController extends Controller
 {
     
 
-    public function index()
-    {
-        $purchases = Warehouse_purchasesModel::with(['storehouse', 'items'])->latest()->get();
+    public function index(Request $request){
+        try{
+            $from = $request->query('from', date('Y-m-d'));
+            $to = $request->query('to', date('Y-m-d'));
+
+            // Validate the date range
+            if (!$from || !$to) {
+                return response()->json(['error' => 'Invalid date range'], 400);
+            }
+
+        $purchases = Warehouse_purchasesModel::with(['storehouse', 'items'])->whereBetween('purchase_date', [$from, $to]);
+        
+    if ($request->filled('search')) {
+        $search = trim($request->search);
+
+        $purchases->where(function ($query) use ($search) {
+            $query->whereHas('storehouse', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        });
+    }
+        $purchases = $purchases->paginate(10);
+
         return view('Admin.warehouse_Purchases.index', compact('purchases'));
+    }
+        catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء جلب بيانات مشتريات المستودعات.');
+        }
     }
 
     public function create()

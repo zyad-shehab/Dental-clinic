@@ -53,14 +53,14 @@
                 </div>
 
                 {{-- اسم المستخدم --}}
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <label for="username" class="form-label">اسم المستخدم</label>
                     <input type="text" class="form-control @error('username') is-invalid @enderror"
                            id="username" name="username" value="{{ old('username', $secretary->username) }}" required>
                     @error('username') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
-                {{-- كلمة المرور (اختياري) --}}
+                
                 <div class="mb-3">
                     <label for="password" class="form-label">كلمة المرور (اتركها فارغة إذا لا تريد التغيير)</label>
                     <input type="password" class="form-control @error('password') is-invalid @enderror"
@@ -68,11 +68,11 @@
                     @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
-                {{-- تأكيد كلمة المرور --}}
+                
                 <div class="mb-3">
                     <label for="password_confirmation" class="form-label">تأكيد كلمة المرور</label>
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
-                </div>
+                </div> --}}
 
                 <button type="submit" class="btn btn-success">حفظ التعديلات</button>
                 <a href="{{ route('admin.secretary.index') }}" class="btn btn-secondary">إلغاء</a>

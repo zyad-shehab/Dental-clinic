@@ -11,8 +11,20 @@ class warehouse_PaymentController extends Controller{
     
     public function index()
     {
-        $payments = Warehouse_paymentsModel::with('storehouses')->latest()->get();
+        try {
+            $from = request()->query('from', date('Y-m-d'));
+            $to = request()->query('to', date('Y-m-d'));
+
+            // Validate the date range
+            if (!$from || !$to) {
+                return response()->json(['error' => 'Invalid date range'], 400);
+            }
+        
+        $payments = Warehouse_paymentsModel::with('storehouses')->whereBetween('payment_date', [$from, $to])->get();
         return view('Admin.warehouse_Payments.index', compact('payments'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء جلب بيانات دفعات المستودعات.');
+        }
     }
 
     public function create()

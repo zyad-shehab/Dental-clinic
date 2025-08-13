@@ -24,7 +24,7 @@ class WarehouseStockController extends Controller
             $query->where('item_name', 'like', "%{$search}%");
     }
 
-    $items = $query->orderBy('end_date')->get();
+    $items = $query->orderBy('end_date')->paginate(10);
 
     $today = now();
     $alert_threshold = $today->copy()->addDays(7); // 7 أيام من الآن

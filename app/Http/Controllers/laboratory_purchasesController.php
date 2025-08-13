@@ -18,9 +18,16 @@ class laboratory_purchasesController extends Controller
 //     $purchases = Laboratory_purchasesModel::with(['laboratory', 'patient', 'items'])->latest()->get();
 //     return view('Admin.laboratory_purchases.index', compact('purchases'));
 // }
-public function index(Request $request)
-{
-    $purchases = Laboratory_purchasesModel::with(['laboratory', 'patient', 'items']);
+public function index(Request $request){
+    try{
+        $from = $request->query('from', date('Y-m-d'));
+        $to = $request->query('to', date('Y-m-d'));
+
+        // Validate the date range
+        if (!$from || !$to) {
+            return response()->json(['error' => 'Invalid date range'], 400);
+        }
+    $purchases = Laboratory_purchasesModel::with(['laboratory', 'patient', 'items'])->whereBetween('purchase_date', [$from, $to]);
 
     if ($request->filled('search')) {
         $search = trim($request->search);
@@ -34,9 +41,13 @@ public function index(Request $request)
         });
     }
 
-    $purchases = $purchases->latest()->get();
+    $purchases = $purchases->latest()->paginate(10);
 
     return view('Admin.laboratory_purchases.index', compact('purchases'));
+    
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'حدث خطأ أثناء جلب بيانات مشتريات المعامل.');
+    }
 }
 
 

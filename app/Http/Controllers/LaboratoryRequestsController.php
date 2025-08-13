@@ -39,7 +39,14 @@ class LaboratoryRequestsController extends Controller{
     public function index(Request $request)
 {
     try {
-        $laboratoryRequests = laboratory_requestsModel::with('laboratory', 'patient', 'items');
+        $from = $request->query('from', date('Y-m-d'));
+        $to = $request->query('to', date('Y-m-d'));
+
+        // Validate the date range
+        if (!$from || !$to) {
+            return response()->json(['error' => 'Invalid date range'], 400);
+        }
+        $laboratoryRequests = laboratory_requestsModel::with('laboratory', 'patient', 'items')->whereBetween('request_date', [$from, $to]);
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -54,7 +61,7 @@ class LaboratoryRequestsController extends Controller{
             });
         }
 
-        $laboratoryRequests = $laboratoryRequests->latest()->paginate(4);
+        $laboratoryRequests = $laboratoryRequests->latest()->paginate(10);
 
         return view('Admin.Laboratory_Requests.index', compact('laboratoryRequests'));
     } catch (\Exception $e) {
@@ -71,8 +78,9 @@ class LaboratoryRequestsController extends Controller{
 
 
     public function create(){
-        $laboratories=laboratory_requestsModel::all();
+        $laboratories=laboratoryModel::all();
         $patients=PatientModel::all();
+        // dd($laboratories->toArray());
         return view('Admin.Laboratory_Requests.create', compact('laboratories', 'patients'));
     }
 

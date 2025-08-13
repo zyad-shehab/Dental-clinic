@@ -7,7 +7,7 @@
     <h4 class="mb-4">التقرير المالي من {{ request('from', date('Y-m-d')) }} إلى {{ request('to', date('Y-m-d')) }}</h4>
 
     {{-- نموذج اختيار التاريخ --}}
-    <form method="GET" action="{{ route('Report.getReport') }}" class="mb-4">
+    <form method="GET" action="{{ route('Report.getReport') }}" class="mb-4 on-print">
         <div class="row">
             <div class="col-md-4">
                 <label>من تاريخ:</label>
@@ -95,6 +95,9 @@
 
                 </tbody>
             </table>
+            <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
         </div>
     </div>
 

@@ -62,6 +62,24 @@
        
        
     </form>
+    @if (session('error'))
+    <div style="color: red; :  padding: 10px; border-radius: 5px;">
+        {{ session('error') }}
+    </div>
+@endif
+    @if ($errors->any())
+    <div style="color: red;">
+        @foreach ($errors->all() as $error)
+            <p>{{ $error }}</p>
+        @endforeach
+    </div>
+@endif
+
+@if (session('success'))
+    <div style="color: green;">
+        {{ session('success') }}
+    </div>
+@endif
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
 </body>

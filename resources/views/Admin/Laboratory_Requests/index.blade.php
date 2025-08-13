@@ -6,15 +6,15 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>إدارة طلبات المعامل</h2>
-        <a href="{{route('LaboratoryRequests.create')}}" class="btn btn-primary">
+        <a href="{{route('LaboratoryRequests.create')}}" class="btn btn-primary on-print">
             <i class="fas fa-plus ml-1"></i>
             إضافة طلب جديد
         </a>
     </div>
 
-    <form action="" method="GET" class="mb-3">
+    <form action="" method="GET" class="mb-3 on-print">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="ابحث عن مريض او طبيب..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control" placeholder="ابحث عن مريض او اسم المعمل..." value="{{ request('search') }}">
             <button class="btn btn-outline-secondary" type="submit">
                 <i class="fas fa-search"></i> بحث
             </button>
@@ -22,6 +22,20 @@
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>
+        <br>
+        <div class="row">
+        <div class="col-md-3">
+                <label>من تاريخ:</label>
+                <input type="date" name="from" class="form-control"
+                       value="{{ request('from', date('Y-m-d')) }}">
+        </div>
+        <div class="col-md-3">
+                <label>إلى تاريخ:</label>
+                <input type="date" name="to" class="form-control"
+                       value="{{ request('to', date('Y-m-d')) }}">
+        </div>
+        </div>
+        
     </form>
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
@@ -102,6 +116,12 @@
                     @endforelse
                 </tbody>
             </table>
+            <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
+            <div class="d-flex justify-content-center on-print">
+                    {{$laboratoryRequests->links() }}
+            </div>
         </div>
     </div>
 </div>

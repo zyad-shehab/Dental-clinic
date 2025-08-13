@@ -1,11 +1,11 @@
-<!-- jQuery -->
+{{-- <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- jQuery UI CSS -->
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 <!-- jQuery UI JS -->
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script> --}}
 
 @extends('admin.layouts.app')
 
@@ -98,23 +98,23 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="required_amount" class="form-label">المبلغ المطلوب</label>
-                        <input type="number" step="0.01" name="required_amount" id="required_amount" class="form-control" value="{{ $session->required_amount }}">
+                        <input type="number"  name="required_amount" id="required_amount" class="form-control" value="{{ $session->required_amount  }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="cash_payment" class="form-label">مدفوع نقدًا</label>
-                        <input type="number" step="0.01" name="cash_payment" id="cash_payment" class="form-control" value="{{ $session->cash_payment }}">
+                        <input type="number"  name="cash_payment" id="cash_payment" class="form-control" value="{{ $session->cash_payment }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="card_payment" class="form-label">مدفوع بنكي</label>
-                        <input type="number" step="0.01" name="card_payment" id="card_payment" class="form-control" value="{{ $session->card_payment }}">
+                        <input type="number"  name="card_payment" id="card_payment" class="form-control" value="{{ $session->card_payment }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="total_amount" class="form-label">المبلغ الإجمالي</label>
-                        <input type="number" step="0.01" name="total_amount" id="total_amount" class="form-control" value="{{ $session->total_amount }}" readonly>
+                        <input type="number"  name="total_amount" id="total_amount" class="form-control" value="{{ $session->total_amount }}" readonly>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="remaining_amount" class="form-label">المبلغ المتبقي</label>
-                        <input type="number" step="0.01" name="remaining_amount" id="remaining_amount" class="form-control" value="{{ $session->remaining_amount }}" readonly>
+                        <input type="number"  name="remaining_amount" id="remaining_amount" class="form-control" value="{{ $session->remaining_amount }}" readonly>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="name_of_bank_account" class="form-label">اسم الحساب البنكي</label>
@@ -132,8 +132,7 @@
                     <textarea name="notes" id="notes" class="form-control" rows="3">{{ $session->notes }}</textarea>
                 </div>
 
-                {{-- صورة الأشعة --}}
-                
+                {{-- صورة الأشعة --}}               
             <div class="mb-3">
                 <label for="xray_image" class="form-label">صورة الأشعة (يمكن تركها فارغة إذا لم تتغير)</label>
                 <input type="file" name="xray_image" id="xray_image" class="form-control">
@@ -153,11 +152,11 @@
         </div>
     </div>
 </div>
-
+@endsection
 {{-- JavaScript للبحث عن المريض والطبيب عند الاضافة--}}
 @include('Admin.partials.scripts');
 
-@endsection
+
 
 {{-- /////////////للحسابات التلقائية و اضافة الخدمات///////////////// --}}
 <script>
@@ -193,17 +192,35 @@
         calculateRequiredAmount();
     }
 
-    function calculateRequiredAmount() {
-        let total = 0;
-        document.querySelectorAll('.service-select').forEach(select => {
-            const selectedOption = select.options[select.selectedIndex];
-            const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-            total += price;
-        });
+    // function calculateRequiredAmount() {
+    //     let total = 0;
+    //     document.querySelectorAll('.service-select').forEach(select => {
+    //         const selectedOption = select.options[select.selectedIndex];
+    //         const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+    //         total += price;
+    //     });
 
-        document.getElementById('required_amount').value = total.toFixed(2);
-        calculateTotalAmount();
+    //     document.getElementById('required_amount').value = total.toFixed(2);
+    //     calculateTotalAmount();
+    // }
+    function calculateRequiredAmount() {
+    let total = 0;
+    document.querySelectorAll('.service-select').forEach(select => {
+        const selectedOption = select.options[select.selectedIndex];
+        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+        total += price;
+    });
+
+    const requiredInput = document.getElementById('required_amount');
+
+    // فقط عيّن القيمة إذا كانت الحقل فارغ أو صفر
+    if (!requiredInput.value || requiredInput.value === '0' || requiredInput.value === '0.00') {
+        requiredInput.value = total.toFixed(2);
     }
+
+    calculateTotalAmount();
+}
+
 
     function calculateTotalAmount() {
         let required = parseFloat(document.getElementById('required_amount').value) || 0;
@@ -229,3 +246,4 @@
         calculateRequiredAmount();
     });
 </script>
+{{-- واحد جديد من الشات  --}}

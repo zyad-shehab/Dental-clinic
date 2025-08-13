@@ -22,21 +22,23 @@
                     <select name="storehouses_id" class="form-control" required>
                         @foreach($storehouse as $store)
                             <option value="{{ $store->id }}"
-                                {{ $payment->storehouses->storehouse_id == $store->id ? 'selected' : '' }}>
+                                {{ $store->id == $payment->storehouses_id ? 'selected' : '' }}>
                                 {{ $store->name }}
                             </option>
                         @endforeach
+                        
+
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">المبلغ نقدًا</label>
-                    <input type="number" name="Paid_cash" class="form-control" step="0.01" value="{{ $payment->paid_cash }}">
+                    <input type="number" name="Paid_cash" class="form-control"  value="{{ $payment->paid_cash }}">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">المبلغ بالبطاقة</label>
-                    <input type="number" name="Paid_card" class="form-control" step="0.01" value="{{ $payment->paid_card }}">
+                    <input type="number" name="Paid_card" class="form-control"  value="{{ $payment->paid_card }}">
                 </div>
 
                 <div class="mb-3">

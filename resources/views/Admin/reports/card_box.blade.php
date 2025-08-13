@@ -8,7 +8,7 @@
 
     {{-- نموذج اختيار التاريخ --}}
     <form method="GET" action="{{ route('Report.getCardBox') }}" class="mb-4">
-        <div class="row">
+        <div class="row on-print">
             <div class="col-md-4">
                 <label>من تاريخ:</label>
                 <input type="date" name="from" class="form-control" value="{{ $from }}">
@@ -17,8 +17,13 @@
                 <label>إلى تاريخ:</label>
                 <input type="date" name="to" class="form-control" value="{{ $to }}">
             </div>
-            <div class="col-md-4 d-flex align-items-end">
+            <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary">عرض التفاصيل</button>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
             </div>
         </div>
     </form>
@@ -43,7 +48,7 @@
                         <tr>
                             <td>{{ $item->session_date }}</td>
                             <td>{{ $item->patient->name ?? 'غير معروف' }}</td>
-                            <td>{{ number_format($item->card_payment, 2) }} ₪</td>
+                            <td>{{ number_format($item->card_payment, 2) }}</td>
                             <td>{{ $item->notes ?? '-' }}</td>
                         </tr>
                     @endforeach
@@ -68,9 +73,9 @@
                 <tbody>
                     @foreach($patient_card_details as $item)
                         <tr>
-                            <td>{{ $item->patient->name ?? 'غير معروف' }}</td>
-                            <td>{{ number_format($item->paid_card, 2) }} ₪</td>
                             <td>{{ $item->payment_date }}</td>
+                            <td>{{ $item->patient->name ?? 'غير معروف' }}</td>
+                            <td>{{ number_format($item->paid_card, 2) }} </td>
                             <td>{{ $item->note ?? '-' }}</td>
                         </tr>
                     @endforeach
@@ -97,7 +102,7 @@
                         <tr>
                             <td>{{ $item->date }}</td>
                             <td>{{ $item->pay_to ?? 'غير معروف' }}</td>
-                            <td>{{ number_format($item->paid_card, 2) }} ₪</td>
+                            <td>{{ number_format($item->paid_card, 2) }} </td>
                             <td>{{ $item->note ?? '-' }}</td>
                             </tr>
                     @endforeach
@@ -106,9 +111,9 @@
         </div>
     </div>
 
-    {{-- دفعات المختبر (بنكي) --}}
+    {{-- دفعات المعمل (بنكي) --}}
     <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">دفعات المختبر (بنكيًا)</div>
+        <div class="card-header bg-secondary text-white">دفعات المعمل (بنكيًا)</div>
         <div class="card-body p-0">
             <table class="table table-sm table-bordered m-0">
                 <thead>
@@ -123,8 +128,8 @@
                     @foreach($lab_card_details as $item)
                         <tr>
                             <td>{{ $item->payment_date }}</td>
-                            <td>{{ $item->laboratory->name ?? 'غير معروف' }}</td>
-                            <td>{{ number_format($item->paid_card, 2) }} ₪</td>
+                            <td>{{ $item->laboratories->name ?? 'غير معروف' }}</td>
+                            <td>{{ number_format($item->paid_card, 2) }} </td>
                             <td>{{ $item->note ?? '-' }}</td>
                         </tr>
                     @endforeach
@@ -150,8 +155,8 @@
                     @foreach($warehouse_card_details as $item)
                         <tr>
                             <td>{{ $item->payment_date }}</td>
-                            <td>{{ $item->storehouse->name ?? 'غير معروف' }}</td>
-                            <td>{{ number_format($item->paid_card, 2) }} ₪</td>
+                            <td>{{ $item->storehouses->name ?? 'غير معروف' }}</td>
+                            <td>{{ number_format($item->paid_card, 2) }} </td>
                             <td>{{ $item->note ?? '-' }}</td>
                         </tr>
                     @endforeach

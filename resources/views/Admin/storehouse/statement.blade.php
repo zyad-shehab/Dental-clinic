@@ -1,16 +1,16 @@
 @extends('admin.layouts.app')
-@section('title', 'كشف حساب المعمل')
+@section('title', 'كشف حساب مستودع')
 
 @section('content')
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">كشف حساب المعمل</h5>
+            <h5 class="mb-0">كشف حساب المستودع</h5>
             <small>{{ \Carbon\Carbon::now()->format('Y-m-d') }}</small>
         </div>
         <div class="card-body">
 
-            <p><strong>اسم المعمل:</strong> {{ $storehouse->name }}</p>
+            <p><strong>اسم المستودع:</strong> {{ $storehouse->name }}</p>
             <p><strong>العنوان :</strong> {{ $storehouse->location }}</p>
 
             <table class="table table-bordered table-striped">
@@ -43,9 +43,9 @@
                     </tr>
                 </tfoot>
             </table>
-            <a href="#" onclick="window.print()" class="btn btn-light btn-sm">
-    <i class="fas fa-print"></i> طباعة
-</a>
+            <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
         </div>
     </div>
 </div>

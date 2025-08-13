@@ -12,9 +12,9 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <label>المخزن</label>
+                        <label>المستودع</label>
                         <select name="storehouses_id" class="form-control" required>
-                            <option value="">-- اختر --</option>
+                            <option value="">--  اختر المستودع--</option>
                             @foreach($storehouses as $store)
                                 <option value="{{ $store->id }}">{{ $store->name }}</option>
                             @endforeach

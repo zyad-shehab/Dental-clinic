@@ -12,13 +12,13 @@
                 @csrf
                 <div class="mb-3">
                     <label for="payment_date" class="form-label">تاريخ الدفعة</label>
-                    <input type="date" name="payment_date" class="form-control" required>
+                    <input type="date" name="payment_date" class="form-control" value="{{ \Carbon\Carbon::now()->toDateString() }}" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="storehouses_id" class="form-label">المستودع</label>
                     <select name="storehouses_id" class="form-control" required>
-                        <option value="">اختر فاتورة</option>
+                        <option value="">اختر المستودع</option>
                         @foreach($storehouse as $store)
                             <option value="{{ $store->id }}">{{ $store->name ?? 'فاتورة #' . $purchase->id }}</option>
                         @endforeach
@@ -27,17 +27,17 @@
 
                 <div class="mb-3">
                     <label class="form-label">المبلغ نقدًا</label>
-                    <input type="number" name="Paid_cash" class="form-control" step="0.01" value="0">
+                    <input type="number" name="Paid_cash" class="form-control" >
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">المبلغ بالبطاقة</label>
-                    <input type="number" name="Paid_card" class="form-control" step="0.01" value="0">
+                    <input type="number" name="Paid_card" class="form-control" >
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">اسم الحساب البنكي</label>
-                    <input type="text" name="name_of_bank_account" class="form-control">
+                    <input type="text" name="name_of_bank_account" class="form-control" value="محمد زاهر حرزالله">
                 </div>
 
                 <div class="mb-3">

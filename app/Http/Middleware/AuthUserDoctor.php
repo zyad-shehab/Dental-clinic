@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthUserAdmin
+class AuthUserDoctor
 {
     /**
      * Handle an incoming request.
@@ -16,11 +16,10 @@ class AuthUserAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::check() && Auth::user()->type === 'admin'){
+        if(Auth::check() && Auth::user()->type === 'doctor'){
         return $next($request);
         }else{
             return response()->view('admin.login');
         }
     }
-
 }

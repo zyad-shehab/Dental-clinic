@@ -10,7 +10,7 @@
             <h5 class="mb-0">تفاصيل الفاتورة #{{ $purchase->id }}</h5>
         </div>
         <div class="card-body">
-            <p><strong>المخزن:</strong> {{ $purchase->storehouse->name ?? '-' }}</p>
+            <p><strong>المستودع:</strong> {{ $purchase->storehouse->name ?? '-' }}</p>
             <p><strong>تاريخ الشراء:</strong> {{ $purchase->purchase_date }}</p>
             <p><strong>الملاحظات:</strong> {{ $purchase->notes ?? 'لا توجد' }}</p>
         </div>
@@ -68,6 +68,9 @@
                     @endforeach
                 </tbody>
             </table>
+            <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
 
             <div class="p-3 text-end">
                 <strong>الإجمالي الكلي:</strong>

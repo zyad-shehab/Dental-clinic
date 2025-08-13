@@ -24,7 +24,7 @@ class PatientController extends Controller{
         $patients->where('name', 'like', "%{$search}%");
         }
 
-        $patients = $patients->latest()->paginate(4);
+        $patients = $patients->latest()->paginate(10);
 
         return view('Admin.Patient.index',compact('patients'));
       }
@@ -105,8 +105,8 @@ class PatientController extends Controller{
     public function show(Request $request,$id){
       try {
         $patient = PatientModel::findOrFail($id);
-        $sessions=Clinic_SessionsModel::with('services')->where('patient_id', $patient->id)->paginate(2);
-        $payments = patient_PaymentModel::where('patient_id', $patient->id)->paginate(3);
+        $sessions=Clinic_SessionsModel::with('services')->where('patient_id', $patient->id)->paginate(5);
+        $payments = patient_PaymentModel::where('patient_id', $patient->id)->paginate(5);
 
         $sortBy = $request->get('sort_by', 'appointment_date');
         $sortOrder = $request->get('order', 'asc');
@@ -114,7 +114,7 @@ class PatientController extends Controller{
         $appointments =AppointmentsModel::with('doctor')
         ->where('patient_id', $patient->id)
         ->orderBy($sortBy, $sortOrder)
-        ->paginate(2)
+        ->paginate(5)
         ->appends(request()->query()); // عدد المواعيد لكل صفحة
 
         return view('Admin.Patient.show', compact('patient','sessions','appointments','payments'));
@@ -143,7 +143,7 @@ class PatientController extends Controller{
                 'date_of_birth' => 'nullable|date|before_or_equal:today',
                 'chronic_diseases'=>'nullable|string',
                 'allergies'=>'nullable|string',
-                'clinical_source'=>'nullable|string',
+                'clinic_source'=>'nullable|string',
             ],[
                 'name.required' => 'الرجاء إدخال اسم المريض.',
                 'gender.required'=>'الرجاء ادخال جنس المريض',
@@ -324,7 +324,7 @@ public function patientStatementPdf($patient_id){
 
 public function patientsDebtsSummary(Request $request)
 {
-    $sort = $request->query('sort', 'last_date_desc');
+    $sort = $request->query('sort','last_date_asc');
 
     $patients = PatientModel::with(['clinicSessions', 'payments'])->get();
 
@@ -344,8 +344,8 @@ public function patientsDebtsSummary(Request $request)
 
         if ($balance > 0) {
             $lastSessionDate = optional($patient->clinicSessions)->max('session_date');
-            $lastPaymentDate = optional($patient->payments)->max('payment_date');
-            $lastDate = max($lastSessionDate, $lastPaymentDate);
+            $lastPaymentDate =   optional($patient->payments)->max('payment_date');
+            $lastDate =date('Y-m-d', strtotime(  max($lastSessionDate, $lastPaymentDate)));
 
             $result[] = (object)[
                 'patient_id' => $patient->id,
@@ -366,7 +366,7 @@ public function patientsDebtsSummary(Request $request)
         return match ($sort_by) {
             'balance' => $item->balance,
             'age'     => $item->age ?? 0,
-            'last_date' => $item->last_date ?->timestamp ?? 0,
+            'last_date' => $item->lastDate ,
             default => 0,
         };
     }, SORT_REGULAR, $sort_dir === 'desc')->values();

@@ -4,10 +4,11 @@
 
 @section('content')
 <div class="container mt-4">
-    <h4 class="mb-4">تفاصيل الصندوق النقدي من {{ $from }} إلى {{ $to }}</h4>
+    <h4 class="mb-4">تفاصيل الصندوق النقدي من 
+        {{ $from }} إلى {{ $to }}</h4>
 
     {{-- نموذج اختيار التاريخ --}}
-    <form method="GET" action="{{ route('Report.getCashBox') }}" class="mb-4">
+    <form method="GET" action="{{ route('Report.getCashBox') }}" class="mb-4 on-print">
         <div class="row">
             <div class="col-md-4">
                 <label>من تاريخ:</label>
@@ -17,8 +18,13 @@
                 <label>إلى تاريخ:</label>
                 <input type="date" name="to" class="form-control" value="{{ $to }}">
             </div>
-            <div class="col-md-4 d-flex align-items-end">
+            <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary">عرض التفاصيل</button>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
             </div>
         </div>
     </form>
@@ -83,9 +89,9 @@
         </div>
     </div>
 
-    {{-- دفعات المختبر --}}
+    {{-- دفعات المعمل --}}
     <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">دفعات المختبر (نقداً)</div>
+        <div class="card-header bg-secondary text-white">دفعات المعمل (نقداً)</div>
         <div class="card-body p-0">
             <table class="table table-sm table-bordered m-0">
                 <thead><tr><th>التاريخ</th><th>المعمل</th><th>المبلغ</th><th>ملاحظة</th></tr></thead>
@@ -93,7 +99,7 @@
                     @foreach($lab_cash_details as $item)
                         <tr>
                             <td>{{ $item->payment_date }}</td>
-                            <td>{{ $item->laboratory->name ?? 'غير معروف' }}</td>
+                            <td>{{ $item->laboratories->name ?? 'غير معروف' }}</td>
                             <td>{{ number_format($item->paid_cash, 2) }} </td>
                             <td>{{ $item->note ?? '-' }}</td>
                         </tr>
@@ -113,7 +119,7 @@
                     @foreach($warehouse_cash_details as $item)
                         <tr>
                             <td>{{ $item->payment_date }}</td>
-                            <td>{{ $item->storehouse->name ?? 'غير معروف' }}</td>
+                            <td>{{ $item->storehouses->name ?? 'غير معروف' }}</td>
                             <td>{{ number_format($item->paid_cash, 2) }}</td>
                             <td>{{ $item->note ?? '-' }}</td>
                         </tr>

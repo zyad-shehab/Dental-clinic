@@ -24,7 +24,15 @@ class Clinic_SessionsController extends Controller{
 
     public function index(Request $request){
      try {
-        $sessions=Clinic_SessionsModel::with('services');
+        $from = $request->query('from', date('Y-m-d'));
+        $to = $request->query('to', date('Y-m-d'));
+
+        // Validate the date range
+        if (!$from || !$to) {
+            return response()->json(['error' => 'Invalid date range'], 400);
+        }
+        $sessions=Clinic_SessionsModel::with('services')
+            ->whereBetween('session_date', [$from, $to]);
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -55,7 +63,7 @@ class Clinic_SessionsController extends Controller{
                     $sessions->latest('session_date')->latest('start_time');
         }
 
-        $sessions = $sessions->latest()->paginate(5)->appends($request->all());
+        $sessions = $sessions->latest()->paginate(10)->appends($request->all());
 
         return view('Admin.Clinic_Sessions.index', compact('sessions'));
       }
@@ -146,6 +154,7 @@ class Clinic_SessionsController extends Controller{
 
         $session = Clinic_SessionsModel::with('services')->findOrFail($id);
 
+        // dd($session);
         return view('Admin.Clinic_Sessions.edit',compact('session','services','patients','doctors'));
       }
       catch (\Exception $e) {
@@ -187,13 +196,14 @@ class Clinic_SessionsController extends Controller{
                 $session = Clinic_SessionsModel::findOrFail($id);
 
                 // رفع صورة الأشعة الجديدة (مع حذف القديمة إن وُجدت)
+                
+        try {
                 if ($request->hasFile('xray_image')) {
                     if ($session->xray_image) {
                         Storage::disk('public')->delete($session->xray_image);
                     }
                     $session->xray_image = $request->file('xray_image')->store('xray_images', 'public');
                 }
-        try {
                 // تحديث البيانات
                 $session->update([
                     'patient_id' => $request->patient_id,

@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+    <style>
+        @media print {
+            .on-print{
+                display: none !important;
+            }
+        }
+    </style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,7 +95,7 @@
     <!-- Main Content -->
     <main class="admin-main">
         <!-- Navbar -->
-        <nav class="admin-navbar">
+        <nav class="admin-navbar on-print">
             <div class="navbar-brand">
                 <button class="btn d-md-none" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
@@ -100,15 +107,15 @@
                 <div class="dropdown">
                     <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
                         <i class="fas fa-user ml-2"></i>
-                        {{-- @auth
+                        @auth
                         {{ Auth::user()->name }}
-                        @endauth --}}
+                        @endauth
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ route('change-password') }}">
                                 <i class="fas fa-user-edit ml-2"></i>
-                                تعديل الملف الشخصي
+                                تغيير كلمة المرور
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>

@@ -22,10 +22,16 @@
                     <select name="laboratories_id" class="form-control" required>
                         @foreach($laboratories as $lab)
                             <option value="{{ $lab->id }}"
-                                {{ $payment->laboratories->laboratories_id == $lab->id ? 'selected' : '' }}>
+                                {{ $lab->id == $payment->laboratories_id ? 'selected' : '' }}>
                                 {{ $lab->name }}
                             </option>
                         @endforeach
+                         {{-- @foreach($patients as $patient)
+                            <option value="{{ $patient->id }}"
+                                {{ $patient->id == $request->patient_id ? 'selected' : '' }}>
+                                {{ $patient->name }}
+                            </option>
+                        @endforeach --}}
                     </select>
                 </div>
 

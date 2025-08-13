@@ -16,24 +16,31 @@
                     <div class="col-md-4">
                         <label for="laboratory_id" class="form-label">المعمل</label>
                         <select name="laboratory_id" class="form-select" required>
+                            <option value="">اختر المعمل</option>
                             @foreach($laboratories as $lab)
                                 <option value="{{ $lab->id }}">{{ $lab->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    {{-- <div class="col-md-4">
                         <label for="patient_id" class="form-label">المريض</label>
                         <select name="patient_id" class="form-select" required>
                             @foreach($patients as $patient)
                                 <option value="{{ $patient->id }}">{{ $patient->name }}</option>
                             @endforeach
                         </select>
+                    </div> --}}
+                    <div class="col-md-4">
+                        <label for="patient_name" class="form-label">اختر المريض</label>
+                        <input type="text" id="patient_name" name="patient_name" class="form-control" autocomplete="off" placeholder="ابحث عن اسم المريض" required>
+                        <input type="hidden" id="patient_id" name="patient_id">
+                        <div id="patient-error" class="text-danger mt-1" style="display:none;">يرجى اختيار مريض من القائمة فقط.</div>
                     </div>
 
                     <div class="col-md-4">
                         <label for="purchase_date" class="form-label">تاريخ الشراء</label>
-                        <input type="date" name="purchase_date" class="form-control" required>
+                        <input type="date" name="purchase_date" class="form-control" value="{{ \Carbon\Carbon::now()->toDateString() }}" required>
                     </div>
                 </div>
 
@@ -65,7 +72,61 @@
         </div>
     </div>
 </div>
+@endsection
 
+<script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+
+{{-- jQuery UI --}}
+<link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}">
+<script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
+{{-- لعرض المرضي --}}
+<script>
+    $(function() {
+        let validPatient = false;
+
+        $("#patient_name").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: '{{ route("ajax.patients") }}',
+                    dataType: "json",
+                    data: { term: request.term },
+                    success: function(data) {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                id: item.id
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                $('#patient_id').val(ui.item.id);
+                validPatient = true;
+                $('#patient-error').hide();
+            },
+            change: function(event, ui) {
+                if (!ui.item) {
+                    $('#patient_id').val('');
+                    validPatient = false;
+                    $('#patient-error').show();
+                }
+            }
+        });
+
+        // تحقق عند إرسال الفورم أن المريض صالح
+        $('form').on('submit', function(e) {
+            if (!validPatient) {
+                e.preventDefault();
+                $('#patient-error').show();
+                $('#patient_name').focus();
+            }
+        });
+    });
+
+</script>
 <script>
     let index = 1;
 
@@ -89,4 +150,3 @@
         button.closest('.item-row').remove();
     }
 </script>
-@endsection

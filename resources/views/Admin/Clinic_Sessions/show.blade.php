@@ -108,10 +108,13 @@
                             </tr>  
                         </tbody>
                     </table>
+                    <a href="#" onclick="window.print()" class="btn btn-light btn-sm">
+                <i class="fas fa-print"></i> طباعة
+            </a>
             </div>
         </div> 
         @if($session->xray_image)
-            <div class="mb-4">
+            <div class="mb-4 on-print">
                 <label class="form-label fw-bold">صورة الجلسة:</label>
                 <div class="border rounded p-2" style="max-width: 300px;">
                     <a href="{{ asset('storage/' . $session->xray_image) }}" target="_blank">

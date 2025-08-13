@@ -9,8 +9,21 @@ class expensesController extends Controller
 {
     public function index()
     {
-        $expenses = expensesModel::get();
+        try {
+            $from = request()->query('from', date('Y-m-d'));
+            $to = request()->query('to', date('Y-m-d'));
+
+            // Validate the date range
+            if (!$from || !$to) {
+                return response()->json(['error' => 'Invalid date range'], 400);
+            }
+        
+        $expenses = expensesModel::whereBetween('date', [$from, $to])->paginate(10);
         return view('Admin.expenses.index', compact('expenses'));
+    }
+        catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء جلب بيانات المصاريف.');
+        }
     }
 
     public function create()

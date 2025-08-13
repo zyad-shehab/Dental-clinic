@@ -14,8 +14,16 @@ class AppointmentsController extends Controller{
 
     public function index(Request $request){
         try {
+
+            $from = $request->query('from', date('Y-m-d'));
+            $to = $request->query('to', date('Y-m-d'));
+
+            // Validate the date range
+            if (!$from || !$to) {
+                return response()->json(['error' => 'Invalid date range'], 400);
+            }
             
-            $appointments=AppointmentsModel::with(['patient','doctor']);
+            $appointments=AppointmentsModel::with(['patient','doctor'])->whereBetween('appointment_date', [$from, $to]);
 
             if ($request->has('status') && is_array($request->status)) {
                 $appointments->whereIn('status', $request->status);
@@ -53,7 +61,7 @@ class AppointmentsController extends Controller{
             }
             
 
-            $appointments = $appointments->paginate(5)->appends($request->all());
+            $appointments = $appointments->paginate(10)->appends($request->all());
 
             return view('Admin.Appointments.index',compact('appointments'));
         }

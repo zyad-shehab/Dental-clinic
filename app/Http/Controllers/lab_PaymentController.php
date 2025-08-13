@@ -9,10 +9,21 @@ use Illuminate\Http\Request;
 class lab_PaymentController extends Controller
 {
       
-    public function index()
-    {
-        $payments = lab_PaymentModel::with('laboratories')->latest()->get();
+    public function index(Request $request){
+        try {
+        $from = $request->query('from', date('Y-m-d'));
+        $to = $request->query('to', date('Y-m-d'));
+
+        // Validate the date range
+        if (!$from || !$to) {
+            return response()->json(['error' => 'Invalid date range'], 400);
+        }
+        $payments = lab_PaymentModel::with('laboratories')->whereBetween('payment_date', [$from, $to])->paginate(10);
         return view('Admin.lab_payments.index', compact('payments'));
+    }
+        catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء جلب بيانات دفعات المعامل.');
+        }
     }
 
     public function create()

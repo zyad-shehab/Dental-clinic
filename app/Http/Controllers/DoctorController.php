@@ -22,7 +22,7 @@ class DoctorController extends Controller{
             $doctors->where('name', 'like', "%{$search}%");
         }
 
-        $doctors = $doctors->latest()->paginate(4);
+        $doctors = $doctors->latest()->paginate(10);
 
         return view('Admin.Doctor.index',compact('doctors'));
         }
@@ -48,20 +48,20 @@ class DoctorController extends Controller{
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|unique:doctor,phone|regex:/^\d{10}$/',
             'date_of_birth' => 'nullable|date|before_or_equal:today',
-            'username' => 'required|string|max:255|unique:doctor,username|regex:/^[a-zA-Z0-9_]+$/',
-            'password' => 'required|string|min:6|confirmed',
+            // 'username' => 'required|string|max:255|unique:doctor,username|regex:/^[a-zA-Z0-9_]+$/',
+            // 'password' => 'required|string|min:6|confirmed',
         ],[
             'name.required' => 'الرجاء إدخال اسم الطبيب.',
             'specialization.required' => 'الرجاء إدخال التخصص.',
-            'username.required' => 'الرجاء إدخال اسم المستخدم.',
-            'username.unique' => 'اسم المستخدم مستخدم من قبل، الرجاء اختيار اسم آخر.',
-            'password.required' => 'الرجاء إدخال كلمة المرور.',
-            'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 أحرف.',
-            'password.confirmed' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',
+            // 'username.required' => 'الرجاء إدخال اسم المستخدم.',
+            // 'username.unique' => 'اسم المستخدم مستخدم من قبل، الرجاء اختيار اسم آخر.',
+            // 'password.required' => 'الرجاء إدخال كلمة المرور.',
+            // 'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 أحرف.',
+            // 'password.confirmed' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',
             'phone.numeric' => 'رقم الهاتف يجب أن يكون أرقامًا فقط.',
             'phone.unique' => 'رقم الهاتف مستخدم من قبل، الرجاء اختيار رقم آخر.',
             'date_of_birth.date' => 'صيغة تاريخ الميلاد غير صحيحة.',
-            'username.regex' => 'اسم المستخدم يجب أن يحتوي على حروف إنجليزية وأرقام فقط بدون فراغات.',
+            // 'username.regex' => 'اسم المستخدم يجب أن يحتوي على حروف إنجليزية وأرقام فقط بدون فراغات.',
             'date_of_birth.before_or_equal' => 'تاريخ الميلاد لا يمكن أن يكون في المستقبل.',
             'phone.digits' => 'رقم الهاتف يجب أن يكون مكونًا من 10 أرقام بالضبط.',
 
@@ -73,13 +73,13 @@ class DoctorController extends Controller{
             'address' => $validated['address'],
             'phone' => $validated['phone'],
             'date_of_birth' => $validated['date_of_birth']]);
-            User::create([
-                'name' => $doctor->name,
-                'username' => $validated['username'],
-                'password' => bcrypt($validated['password']),
-                'type' => 'doctor',
-                'type_id' => $doctor->id,
-            ]);
+            // User::create([
+            //     'name' => $doctor->name,
+            //     'username' => $validated['username'],
+            //     'password' => bcrypt($validated['password']),
+            //     'type' => 'doctor',
+            //     'type_id' => $doctor->id,
+            // ]);
         
         return redirect()
                 ->route('admin.doctor.index')
@@ -149,24 +149,24 @@ class DoctorController extends Controller{
             'digits:10',
             Rule::unique('doctor', 'phone')->ignore($doctor->id),],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
-            'username' => [
-                'required', 'string', 'max:255',
-                Rule::unique('doctor', 'username')->ignore($doctor->id),
-                'regex:/^[a-zA-Z0-9_]+$/',
-            ],
-            'password' => 'nullable|string|min:6|confirmed',
+            // 'username' => [
+            //     'required', 'string', 'max:255',
+            //     Rule::unique('doctor', 'username')->ignore($doctor->id),
+            //     'regex:/^[a-zA-Z0-9_]+$/',
+            // ],
+            // 'password' => 'nullable|string|min:6|confirmed',
         ],[
                 'name.required' => 'الرجاء إدخال اسم الطبيب.',
                 'specialization.required' => 'الرجاء إدخال التخصص.',
-                'username.required' => 'الرجاء إدخال اسم المستخدم.',
-                'username.unique' => 'اسم المستخدم مستخدم من قبل، الرجاء اختيار اسم آخر.',
-                'password.required' => 'الرجاء إدخال كلمة المرور.',
-                'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 أحرف.',
-                'password.confirmed' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',
+                // 'username.required' => 'الرجاء إدخال اسم المستخدم.',
+                // 'username.unique' => 'اسم المستخدم مستخدم من قبل، الرجاء اختيار اسم آخر.',
+                // 'password.required' => 'الرجاء إدخال كلمة المرور.',
+                // 'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 أحرف.',
+                // 'password.confirmed' => 'تأكيد كلمة المرور لا يطابق كلمة المرور.',
                 'phone.numeric' => 'رقم الهاتف يجب أن يكون أرقامًا فقط.',
                 'phone.unique' => 'رقم الهاتف مستخدم من قبل، الرجاء اختيار رقم آخر.',
                 'date_of_birth.date' => 'صيغة تاريخ الميلاد غير صحيحة.',
-                'username.regex' => 'اسم المستخدم يجب أن يحتوي على حروف إنجليزية وأرقام فقط بدون فراغات.',
+                // 'username.regex' => 'اسم المستخدم يجب أن يحتوي على حروف إنجليزية وأرقام فقط بدون فراغات.',
                 'date_of_birth.before_or_equal' => 'تاريخ الميلاد لا يمكن أن يكون في المستقبل.',
                 'phone.digits' => 'رقم الهاتف يجب أن يكون مكونًا من 10 أرقام بالضبط.',
 
@@ -177,12 +177,12 @@ class DoctorController extends Controller{
         $doctor->address = $validated['address'] ?? null;
         $doctor->phone = $validated['phone'] ?? null;
         $doctor->date_of_birth = $validated['date_of_birth'] ?? null;
-        $doctor->username = $validated['username'];
+        // $doctor->username = $validated['username'];
 
         // تحديث كلمة المرور فقط إذا أدخلها المستخدم
-        if (!empty($validated['password'])) {
-            $doctor->password = bcrypt($validated['password']);
-        }
+        // if (!empty($validated['password'])) {
+        //     $doctor->password = bcrypt($validated['password']);
+        // }
 
         $doctor->save();
 

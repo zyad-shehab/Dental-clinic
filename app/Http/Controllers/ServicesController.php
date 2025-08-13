@@ -18,7 +18,7 @@ class ServicesController extends Controller{
             $services->where('name', 'like', "%{$search}%");
         }
 
-        $services = $services->latest()->paginate(5);
+        $services = $services->latest()->paginate(10);
 
 
         return view('Admin.Clinic-services.index',compact('services'));

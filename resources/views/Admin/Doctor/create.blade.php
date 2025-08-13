@@ -44,7 +44,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <label for="username" class="form-label">username:</label>
                     <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" required>
                     @error('username')
@@ -58,7 +58,6 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                {{-- تأكيد كلمة المرور --}}
                 <div class="mb-3">
                     <label for="password_confirmation" class="form-label">تأكيد كلمة المرور</label>
                     <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
@@ -66,7 +65,7 @@
                     @error('password_confirmation')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                </div>
+                </div> --}}
 
                 <button type="submit" class="btn btn-primary">إضافة طبيب</button>
                 <a href="{{ route('admin.doctor.index') }}" class="btn btn-secondary">إلغاء</a>

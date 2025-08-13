@@ -70,10 +70,9 @@
                 <strong>الإجمالي الكلي للفاتورة:</strong>
                 <span class="fs-5 text-success">{{ number_format($purchase->total_amount, 2) }} شيكل</span>
             </div>
-            <a href="{{ route('laboratory_purchases.print', $purchase->id) }}" class="btn btn-outline-dark mb-3" target="_blank">
-    <i class="fas fa-print"></i> طباعة / تحميل PDF
-</a>
-
+                <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                                <i class="fas fa-print"></i> طباعة
+                </a>
         </div>
     </div>
 

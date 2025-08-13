@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', ' إدارة عيادة روتس دانت')
+@section('title', ' إدارة عيادة روتس ')
 
 @section('content')
 <div class="container mt-4">
@@ -21,17 +21,34 @@
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>
+        <br>
+        <div class="row">
+        <div class="col-md-3">
+                <label>من تاريخ:</label>
+                <input type="date" name="from" class="form-control"
+                       value="{{ request('from', date('Y-m-d')) }}">
+        </div>
+        <div class="col-md-3">
+                <label>إلى تاريخ:</label>
+                <input type="date" name="to" class="form-control"
+                       value="{{ request('to', date('Y-m-d')) }}">
+        </div>
         {{-- الترتيب --}}
         <div class="col-md-3">
+            <label>ترتيب حسب:</label>
             <select name="sort" class="form-select">
                 <option value="">ترتيب حسب...</option>
                 <option value="date_asc" {{ request('sort') == 'date_asc' ? 'selected' : '' }}>التاريخ من الأقدم</option>
                 <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>التاريخ من الأحدث</option>
             </select>
         </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">عرض </button>        
+        </div>
+        </div>
 
     </form>
-
+    <br>
     <div class="card shadow">
         <div class="card-body">
             <div class="table-responsive">

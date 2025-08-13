@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', ' إدارة عيادة روتس دانت')
+@section('title', ' إدارة عيادة روتس ')
 
 @section('content')
 <div class="container mt-4">
@@ -13,7 +13,7 @@
 
     <form action="" method="GET" class="mb-3">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="ابحث عن الطبيب..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control" placeholder="ابحث عن معمل..." value="{{ request('search') }}">
             <button class="btn btn-outline-secondary" type="submit">
                 <i class="fas fa-search"></i> بحث
             </button>

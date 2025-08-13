@@ -29,14 +29,14 @@
         </tbody>
     </table> --}}
     <form method="GET" action="{{ route('Report.patientsDebtsSummary') }}" class="mb-4">
-    <div class="row">
+    <div class="row on-print">
         <div class="col-md-4">
             <label>ترتيب حسب:</label>
             <select name="sort" class="form-control" onchange="this.form.submit()">
                 <option value="last_date_asc" {{ request('sort') == 'last_date_asc' ? 'selected' : '' }}>
                     التاريخ - تصاعدي
                 </option>
-                <option value="last_date_desc" {{ request('sort', 'last_date_desc') == 'last_date_desc' ? 'selected' : '' }}>
+                <option value="last_date_desc" {{ request('sort') == 'last_date_desc' ?  'selected' : '' }}>
                     التاريخ - تنازلي
                 </option>
                 <option value="balance_asc" {{ request('sort') == 'balance_asc' ? 'selected' : '' }}>
@@ -90,6 +90,10 @@
     <strong>إجمالي  الديون على المرضى: {{ number_format($total_debts, 2) }}</strong>
      
 </div>
+                <a href="#" onclick="window.print()" class="btn btn-light btn-sm on-print">
+                <i class="fas fa-print"></i> طباعة
+            </a>
+
 
 </div>
 @endsection

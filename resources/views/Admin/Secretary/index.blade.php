@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title', ' إدارة عيادة روتس دانت')
+@section('title', ' إدارة عيادة روتس ')
 
 @section('content')
 <div class="container mt-4">

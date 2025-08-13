@@ -26,14 +26,17 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">المريض</label>
-                        <select name="patient_id" class="form-select" required>
-                            @foreach($patients as $patient)
-                                <option value="{{ $patient->id }}" {{ $purchase->patient_id == $patient->id ? 'selected' : '' }}>
-                                    {{ $patient->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <label for="patient_name" class="form-label">اسم المريض</label>
+                    <input type="text" id="patient_name" name="patient_name" class="form-control" 
+                        value="{{ old('patient_name', $purchase->patient->name ?? '') }}" 
+                        autocomplete="off" required>
+                    
+                    <input type="hidden" id="patient_id" name="patient_id" 
+                        value="{{ old('patient_id', $purchase->patient->id ?? '') }}">
+
+                    <div id="patient-error" class="text-danger mt-1" style="display:none;">
+                        يرجى اختيار مريض من القائمة فقط.
+                    </div>
                     </div>
 
                     <div class="col-md-4">
@@ -77,6 +80,61 @@
         </div>
     </div>
 </div>
+
+    
+{{-- jQuery --}}
+<script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+
+{{-- jQuery UI --}}
+<link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}">
+<script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
+
+<script>
+    $(function() {
+        let validPatient = false;
+
+        $("#patient_name").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: '{{ route("ajax.patients") }}',
+                    dataType: "json",
+                    data: { term: request.term },
+                    success: function(data) {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                id: item.id
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                $('#patient_id').val(ui.item.id);
+                validPatient = true;
+                $('#patient-error').hide();
+            },
+            change: function(event, ui) {
+                if (!ui.item) {
+                    $('#patient_id').val('');
+                    validPatient = false;
+                    $('#patient-error').show();
+                }
+            }
+        });
+
+        // تحقق عند إرسال الفورم أن المريض صالح
+        $('form').on('submit', function(e) {
+            if (!validPatient) {
+                e.preventDefault();
+                $('#patient-error').show();
+                $('#patient_name').focus();
+            }
+        });
+    });
+</script>
 
 <script>
     let index = {{ $purchase->items->count() }};
