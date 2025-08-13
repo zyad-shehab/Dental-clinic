@@ -220,4 +220,3 @@ Route::middleware(['CheckRole:admin,secretary'])->group(function () {
         // Route::get('change-password')->view('Admin.change_password');
 // });
 
-require __DIR__.'/auth.php';

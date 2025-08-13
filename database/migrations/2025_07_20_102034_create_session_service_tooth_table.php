@@ -21,9 +21,7 @@ return new class extends Migration
     public function up(): void{
         Schema::create('session_service_tooth', function (Blueprint $table) {
         $table->id();
-        $table->unsignedBigInteger('clinic_session_id');
-        $table->unsignedBigInteger('service_id');
-
+      
         $table->foreignId('clinic_session_id')->constrained('clinic_sessions')->onDelete('cascade');
         $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
         

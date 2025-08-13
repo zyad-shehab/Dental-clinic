@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('laboratory_request_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('laboratory_request_id')->constrained('laboratory_requests')->onDelete('cascade');
-            $table->string('category'); 
+            $table->foreignId('laboratory_request_id')
+                ->constrained('laboratory_requests')
+                ->onDelete('cascade');            $table->string('category'); 
             $table->integer('quantity')->default(1);
             $table->string('tooth_number'); // رقم السن
+           
             $table->timestamps();
         });
     }
