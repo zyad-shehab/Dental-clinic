@@ -58,7 +58,7 @@
         <div class="mb-3">
             <input type="password" name="password" class="form-control" placeholder="كلمة المرور">
         </div>
-        <button type="submit" class="btn btn-success btn-sm register-btn">دخول</button>
+        <button type="submit" class="btn btn-primary btn-sm register-btn">دخول</button>
        
        
     </form>
