@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class DoctorController extends Controller{
     
-     public function index(Request $request){
+    public function index(Request $request){
         try {
         $doctors=DoctorModel::query();
 

@@ -103,6 +103,7 @@ class laboratoryController extends Controller
                 ->with('error', 'حدث خطأ أثناء تحديث بيانات المعمل: ' . $e->getMessage());
       }
     }
+
     public function destroy($id){
         try {
         $Laboratory = laboratoryModel::findOrFail($id);
@@ -119,95 +120,65 @@ class laboratoryController extends Controller
         }
     }
 
-// public function laboratoryStatement($laboratory_id){
+    public function laboratoryStatement($laboratory_id){
+        try {
 
-//   $laboratory = laboratoryModel::findOrFail($laboratory_id);
+        $lab = laboratoryModel::findOrFail($laboratory_id);
 
-//   $Laboratory_purchases = Laboratory_purchasesModel::where('laboratory_id', $laboratory_id)
-//     ->select('purchase_date as date', 'total_amount as amount')
-//     ->get()
-//     ->map(function ($item) {
-//         return new StatementItemModel([
-//             'date' => $item->date,
-//             'amount' => $item->amount,
-//             'type' => 'فاتورة شراء',
-//         ]);
-//     });
+        $labItems = Laboratory_purchasesModel::where('laboratory_id', $laboratory_id)
+            ->select('purchase_date as date', 'total_amount as amount')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'amount' => $item->amount,
+                    'type' => 'فاتورة شراء',
+                    'balance' => null,
+                    
+                ];
+            });
 
-//   $lab_Payment = lab_PaymentModel::where('laboratories_id', $laboratory_id)
-//     ->select('payment_date as date', 'total as amount')
-//     ->get()
-//     ->map(function ($item) {
-//         return new StatementItemModel([
-//             'date' => $item->date,
-//             'amount' => $item->amount,
-//             'type' => 'دفعة',
-//         ]);
-//     });
+        $paymentItems = lab_PaymentModel::where('laboratories_id', $laboratory_id)
+            ->select('payment_date as date', 'total as amount')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'amount' => $item->amount,
+                    'type' => 'دفعة',
+                    'balance' => null
+                    
+                ];
+            });
 
-//   // دمج وترتيب حسب التاريخ
-//   $statement = $lab_Payment-> $Laboratory_purchases ;
+        // دمج وترتيب حسب التاريخ
+        $statement = $labItems->merge($paymentItems)->sortBy('date')->values();
 
-//   // حساب الرصيد
-//   $balance = 0;
-//   foreach ($statement as $item) {
-//     if ($item->type == 'دفعة') {
-//         $balance += $item->amount;
-//     } else {
-//         $balance -= $item->amount;
-//     }
-//     $item->balance = $balance;
-//   }
-// dd($statement);
-// //    return view('Admin.laboratory.statement', compact('statement', 'balance', 'laboratory'));
-// }
-public function laboratoryStatement($laboratory_id){
+        // حساب الرصيد
+        $balance = 0;
+        
+            $statement = $statement->map(function ($item) use (&$balance) {
+            if ($item['type'] == 'فاتورة شراء') {
+                $balance -= $item['amount'];
+            } else {
+                $balance += $item['amount'];
+            }
 
-  $lab = laboratoryModel::findOrFail($laboratory_id);
+            $item['balance'] = $balance;
+            return $item;
+            });
 
-  $labItems = Laboratory_purchasesModel::where('laboratory_id', $laboratory_id)
-    ->select('purchase_date as date', 'total_amount as amount')
-    ->get()
-    ->map(function ($item) {
-        return [
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'فاتورة شراء',
-            'balance' => null,
-            
-        ];
-    });
-
-  $paymentItems = lab_PaymentModel::where('laboratories_id', $laboratory_id)
-    ->select('payment_date as date', 'total as amount')
-    ->get()
-    ->map(function ($item) {
-        return [
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'دفعة',
-            'balance' => null
-            
-        ];
-    });
-
-  // دمج وترتيب حسب التاريخ
-  $statement = $labItems->merge($paymentItems)->sortBy('date')->values();
-
-  // حساب الرصيد
-  $balance = 0;
-  
-$statement = $statement->map(function ($item) use (&$balance) {
-    if ($item['type'] == 'فاتورة شراء') {
-        $balance -= $item['amount'];
-    } else {
-        $balance += $item['amount'];
+        return view('Admin.laboratory.statement', compact('statement', 'balance', 'lab'));
+        }
+           
+        catch (\Exception $e) {
+                Log::error('Error generating laboratory statement: ' . $e->getMessage(), [
+                    'exception' => $e,
+                ]);
+                return redirect()
+                    ->back()
+                    ->with('error', 'حدث خطأ أثناء إنشاء كشف الحساب للمعمل: ' . $e->getMessage());
+        }
+        
+        }
     }
-
-    $item['balance'] = $balance;
-    return $item;
-});
-
-   return view('Admin.laboratory.statement', compact('statement', 'balance', 'lab'));
-}
-}

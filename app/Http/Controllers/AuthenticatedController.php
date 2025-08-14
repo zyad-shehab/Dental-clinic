@@ -8,19 +8,7 @@ use Illuminate\Support\Facades\Auth ;
 use Illuminate\Support\Facades\Hash;
 
 class AuthenticatedController extends Controller{
-// {
-//     public function login(Request $request){
-//     $credentials = $request->only('username', 'password');
 
-//     if (Auth::attempt($credentials)) {
-//         return redirect()->route('admin.index'); // أو أي مكان تريده
-//     }
-
-//     return back()->with('danger', 'اسم المستخدم أو كلمة المرور غير صحيحة');
-// }
-//     public function Authenticated(Request $request){
-//         creds
-//     }
      public function login()  {
         return view('Admin.login');
     }
@@ -44,7 +32,7 @@ class AuthenticatedController extends Controller{
      auth::logout();
      $request->session()->invalidate();
      $request->session()->regenerate();
-     return redirect()->route('user.login.page');
+     return redirect()->route('loginPage')->with('error','تم تسجيل الخروج بنجاح');
     }
     
 

@@ -199,187 +199,156 @@ class PatientController extends Controller{
         }  
     }
 
-public function patientStatement($patient_id){
+    public function patientStatement($patient_id){
+        try{
+        $patient = PatientModel::findOrFail($patient_id);
 
-  $patient = PatientModel::findOrFail($patient_id);
+        $sessionItems = Clinic_SessionsModel::where('patient_id', $patient_id)
+            ->select('session_date as date', 'remaining_amount as amount')
+            ->get()
+            ->map(function ($item) {
+                return (object)[
+                    'date' => $item->date,
+                    'amount' => $item->amount,
+                    'type' => 'جلسة',
+                ];
+            });
 
-  $sessionItems = Clinic_SessionsModel::where('patient_id', $patient_id)
-    ->select('session_date as date', 'remaining_amount as amount')
-    ->get()
-    ->map(function ($item) {
-        return (object)[
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'جلسة',
-        ];
-    });
+        $paymentItems = patient_PaymentModel::where('patient_id', $patient_id)
+            ->select('payment_date as date', 'total as amount')
+            ->get()
+            ->map(function ($item) {
+                return (object)[
+                    'date' => $item->date,
+                    'amount' => $item->amount,
+                    'type' => 'دفعة',
+                ];
+            });
 
-  $paymentItems = patient_PaymentModel::where('patient_id', $patient_id)
-    ->select('payment_date as date', 'total as amount')
-    ->get()
-    ->map(function ($item) {
-        return (object)[
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'دفعة',
-        ];
-    });
+        // دمج وترتيب حسب التاريخ
+        $statement = $sessionItems->merge($paymentItems)->sortBy('date')->values();
 
-  // دمج وترتيب حسب التاريخ
-  $statement = $sessionItems->merge($paymentItems)->sortBy('date')->values();
+        // حساب الرصيد
+        $balance = 0;
+        foreach ($statement as $item) {
+            if ($item->type == 'جلسة') {
+                $balance += $item->amount;
+            } else {
+                $balance -= $item->amount;
+            }
+            $item->balance = $balance;
+        }
 
-  // حساب الرصيد
-  $balance = 0;
-  foreach ($statement as $item) {
-    if ($item->type == 'جلسة') {
-        $balance += $item->amount;
-    } else {
-        $balance -= $item->amount;
-    }
-    $item->balance = $balance;
-  }
-
-   return view('Admin.Patient.statement', compact('statement', 'balance', 'patient'));
-}
-
-public function patientStatementPdf($patient_id){
-    $patient = \App\Models\PatientModel::findOrFail($patient_id);
-
-    $sessionItems = \App\Models\Clinic_SessionsModel::where('patient_id', $patient_id)
-        ->select('session_date as date', 'required_amount as amount')
-        ->get()
-        ->map(fn($item) => (object)[
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'جلسة',
-        ]);
-
-    $paymentItems = patient_PaymentModel::where('patient_id', $patient_id)
-        ->select('payment_date as date', 'paid_amount as amount')
-        ->get()
-        ->map(fn($item) => (object)[
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'دفعة',
-        ]);
-
-    $statement = $sessionItems->merge($paymentItems)->sortBy('date')->values();
-
-    $balance = 0;
-    foreach ($statement as $item) {
-        $balance += ($item->type === 'جلسة') ? $item->amount : -$item->amount;
-        $item->balance = $balance;
-    }
-
-    $pdf = Pdf::loadView('patients.statement_pdf', compact('statement', 'balance', 'patient'))
-              ->setPaper('A4', 'portrait');
-
-    return $pdf->download('كشف_حساب_' . $patient->name . '.pdf');
-}
-
-// public function patientsDebtsSummary()
-// {
-//     // نجلب جميع المرضى مع المبالغ
-//     $patients = PatientModel::with([
-//         'clinicSessions' => function ($q) {
-//             $q->select('patient_id', 'remaining_amount', 'session_date');
-//         },
-//         'payments' => function ($q) {
-//             $q->select('patient_id', 'paid_cash', 'paid_card', 'payment_date');
-//         }
-//     ])->get();
-
-//     $result = [];
-
-//     foreach ($patients as $patient) {
-//         $total_remaining = $patient->clinicSessions->sum('remaining_amount');
-//         $total_paid = $patient->payments->sum(function ($payment) {
-//             return $payment->paid_cash + $payment->paid_card;
-//         });
-
-//         $balance = $total_remaining - $total_paid;
-
-//         if ($balance > 0) {
-//             // أحدث تاريخ بين الجلسات والدفعات
-//             $lastSessionDate = $patient->clinicSessions->max('session_date');
-//             $lastPaymentDate = $patient->payments->max('payment_date');
-//             $lastDate = max($lastSessionDate, $lastPaymentDate);
-
-//             $result[] = (object)[
-//                 'patient_id' => $patient->id,
-//                 'patient_name' => $patient->name,
-//                 'balance' => $balance,
-//                 'last_date' => $lastDate,
-//             ];
-//         }
-//     }
-
-//     // ترتيب النتائج حسب آخر تاريخ تنازلي
-//     $result = collect($result)->sortByDesc('last_date')->values();
-
-//     return view('Admin.Patient.patientsDebtsSummary', [
-//         'debts' => $result,
-//     ]);
-// }
-
-public function patientsDebtsSummary(Request $request)
-{
-    $sort = $request->query('sort','last_date_asc');
-
-    $patients = PatientModel::with(['clinicSessions', 'payments'])->get();
-
-    // تحليل القيمة إلى جزئين: الحقل والاتجاه
-    [$sort_by, $sort_dir] = explode('_', $sort);
-
-    $result = [];
-
-    foreach ($patients as $patient) {
-        $total_remaining = optional($patient->clinicSessions)->sum('remaining_amount') ?? 0;
-
-        $total_paid = optional($patient->payments)->sum(function ($payment) {
-            return $payment->paid_cash + $payment->paid_card;
-        }) ?? 0;
-
-        $balance = $total_remaining - $total_paid;
-
-        if ($balance > 0) {
-            $lastSessionDate = optional($patient->clinicSessions)->max('session_date');
-            $lastPaymentDate =   optional($patient->payments)->max('payment_date');
-            $lastDate =date('Y-m-d', strtotime(  max($lastSessionDate, $lastPaymentDate)));
-
-            $result[] = (object)[
-                'patient_id' => $patient->id,
-                'patient_name' => $patient->name,
-                'phone' => $patient->phone ?? '-',
-                'address' => $patient->address ?? '-',
-                // 'dob' => $patient->date_of_birth ?? null,
-                'age' => $patient->date_of_birth ? \Carbon\Carbon::parse($patient->date_of_birth)->age : '-',
-                'balance' => $balance,
-                'last_date' => $lastDate,
-            ];
+        return view('Admin.Patient.statement', compact('statement', 'balance', 'patient'));
+        }
+        catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء جلب كشف الحساب: ' . $e->getMessage());
         }
     }
 
-    // ترتيب النتائج حسب طلب المستخدم
-    
-    $result = collect($result)->sortBy(function ($item) use ($sort_by) {
-        return match ($sort_by) {
-            'balance' => $item->balance,
-            'age'     => $item->age ?? 0,
-            'last_date' => $item->lastDate ,
-            default => 0,
-        };
-    }, SORT_REGULAR, $sort_dir === 'desc')->values();
-    // dd($result->pluck('last_date'));
-    $total_debts = collect($result)->sum('balance');
 
-    return view('Admin.Patient.patientsDebtsSummary', [
-        'debts' => $result,
-        'sort_by' => $sort_by,
-        'result' => $result,
-        'total_debts' => $total_debts,
-    ]);
-}
+    public function patientStatementPdf($patient_id){
+        $patient = \App\Models\PatientModel::findOrFail($patient_id);
+
+        $sessionItems = \App\Models\Clinic_SessionsModel::where('patient_id', $patient_id)
+            ->select('session_date as date', 'required_amount as amount')
+            ->get()
+            ->map(fn($item) => (object)[
+                'date' => $item->date,
+                'amount' => $item->amount,
+                'type' => 'جلسة',
+            ]);
+
+        $paymentItems = patient_PaymentModel::where('patient_id', $patient_id)
+            ->select('payment_date as date', 'paid_amount as amount')
+            ->get()
+            ->map(fn($item) => (object)[
+                'date' => $item->date,
+                'amount' => $item->amount,
+                'type' => 'دفعة',
+            ]);
+
+        $statement = $sessionItems->merge($paymentItems)->sortBy('date')->values();
+
+        $balance = 0;
+        foreach ($statement as $item) {
+            $balance += ($item->type === 'جلسة') ? $item->amount : -$item->amount;
+            $item->balance = $balance;
+        }
+
+        $pdf = Pdf::loadView('patients.statement_pdf', compact('statement', 'balance', 'patient'))
+                ->setPaper('A4', 'portrait');
+
+        return $pdf->download('كشف_حساب_' . $patient->name . '.pdf');
+    }
+
+
+
+    public function patientsDebtsSummary(Request $request){
+        try {
+        $sort = $request->query('sort','last_date_asc');
+
+        $patients = PatientModel::with(['clinicSessions', 'payments'])->get();
+
+        // تحليل القيمة إلى جزئين: الحقل والاتجاه
+        [$sort_by, $sort_dir] = explode('_', $sort);
+
+        $result = [];
+
+        foreach ($patients as $patient) {
+            $total_remaining = optional($patient->clinicSessions)->sum('remaining_amount') ?? 0;
+
+            $total_paid = optional($patient->payments)->sum(function ($payment) {
+                return $payment->paid_cash + $payment->paid_card;
+            }) ?? 0;
+
+            $balance = $total_remaining - $total_paid;
+
+            if ($balance > 0) {
+                $lastSessionDate = optional($patient->clinicSessions)->max('session_date');
+                $lastPaymentDate =   optional($patient->payments)->max('payment_date');
+                $lastDate =date('Y-m-d', strtotime(  max($lastSessionDate, $lastPaymentDate)));
+
+                $result[] = (object)[
+                    'patient_id' => $patient->id,
+                    'patient_name' => $patient->name,
+                    'phone' => $patient->phone ?? '-',
+                    'address' => $patient->address ?? '-',
+                    // 'dob' => $patient->date_of_birth ?? null,
+                    'age' => $patient->date_of_birth ? \Carbon\Carbon::parse($patient->date_of_birth)->age : '-',
+                    'balance' => $balance,
+                    'last_date' => $lastDate,
+                ];
+            }
+        }
+
+        // ترتيب النتائج حسب طلب المستخدم
+        
+        $result = collect($result)->sortBy(function ($item) use ($sort_by) {
+            return match ($sort_by) {
+                'balance' => $item->balance,
+                'age'     => $item->age ?? 0,
+                'last_date' => $item->lastDate ,
+                default => 0,
+            };
+        }, SORT_REGULAR, $sort_dir === 'desc')->values();
+        // dd($result->pluck('last_date'));
+        $total_debts = collect($result)->sum('balance');
+
+        return view('Admin.Patient.patientsDebtsSummary', [
+            'debts' => $result,
+            'sort_by' => $sort_by,
+            'result' => $result,
+            'total_debts' => $total_debts,
+        ]);
+        }
+        catch (\Exception $e) {
+            Log::error('Error fetching patients debts summary: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+            return redirect()->back()->with('error', 'حدث خطأ أثناء جلب ملخص ديون المرضى: ' . $e->getMessage());
+        }
+    }
 
 
 

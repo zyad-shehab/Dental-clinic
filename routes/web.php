@@ -40,11 +40,6 @@ Route::post('/admin/logout', [AuthenticatedController::class, 'logout'])->name('
 
 Route::get('/dashboard',[AdminController::class,'index'])->middleware('CheckRole:admin,secretary')->name('dashboard');
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
 
 Route::middleware(['CheckRole:admin'])->group(function () {
     Route::get('admin/doctor',[DoctorController::class,'index'])->middleware('authUserAdmin')->name('admin.doctor.index');
@@ -108,7 +103,6 @@ Route::middleware(['CheckRole:admin'])->group(function () {
     Route::delete('admin/labpayment/destroy/{id}',[lab_PaymentController::class,'destroy'])->name('labpayment.destroy');
     ///////////////////////////
      
-    Route::get('/patients/{id}/statement', [PatientController::class, 'patientStatement'])->name('patients.statement');
     Route::get('/laboratory/{id}/statement', [laboratoryController::class, 'laboratoryStatement'])->name('laboratory.statement');
     Route::get('/storehouse/{id}/statement', [storehouseController::class, 'storehouseStatement'])->name('storehouse.statement');
 
@@ -118,7 +112,7 @@ Route::middleware(['CheckRole:admin'])->group(function () {
 
 
     ////////////////////////
-     Route::get('laboratory_purchases/{id}/print', [laboratory_purchasesController::class, 'print'])->name('laboratory_purchases.print');
+    Route::get('laboratory_purchases/{id}/print', [laboratory_purchasesController::class, 'print'])->name('laboratory_purchases.print');
 
     Route::get('/patients/{id}/statement/pdf', [PatientController::class, 'patientStatementPdf'])->name('patients.statement.pdf');
 
@@ -137,24 +131,11 @@ Route::middleware(['CheckRole:admin'])->group(function () {
     Route::put('admin/storehouse/update/{id}',[storehouseController::class,'update'])->name('storehouse.update');
     Route::delete('admin/storehouse/destroy/{id}',[storehouseController::class,'destroy'])->name('storehouse.destroy');
     ///////////////////////////
-  
-});       
-    
-   
-
     Route::get('/ajax/patients', [App\Http\Controllers\AjaxController::class, 'searchPatients'])->name('ajax.patients');
     Route::get('/ajax/doctors', [App\Http\Controllers\AjaxController::class, 'searchDoctors'])->name('ajax.doctors');
-    // للطباعة
-   
-
-
-    
-    /////////////////////////////////
-    
-   
     
   
-    
+});       
     
 Route::middleware(['CheckRole:admin,secretary'])->group(function () {
         Route::get('admin/patients',[PatientController::class,'index'])->name('admin.patients.index');
@@ -214,9 +195,12 @@ Route::middleware(['CheckRole:admin,secretary'])->group(function () {
         return view('Admin.change_password');
         })->name('change-password');
 
-    });
-        Route::resource('admin',AdminController::class);
         
-        // Route::get('change-password')->view('Admin.change_password');
-// });
+        Route::get('/patients/{id}/statement', [PatientController::class, 'patientStatement'])->name('patients.statement');
+        
+        Route::resource('admin',AdminController::class);
+
+
+    });
+        
 

@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 
 class storehouseController extends Controller
 {
-        public function index(Request $request){
+    public function index(Request $request){
       try {
         $storehouses = storehouseModel::query();
 
@@ -115,6 +115,7 @@ class storehouseController extends Controller
                 ->with('error', 'حدث خطأ أثناء تحديث بيانات المستودع: ' . $e->getMessage());
       }
     }
+
     public function destroy($id){
         try {
         $storehouse = storehouseModel::findOrFail($id);
@@ -130,53 +131,54 @@ class storehouseController extends Controller
                 ->with('error', 'حدث خطأ أثناء حذف المستودع: ' . $e->getMessage());
         }
     }
-public function storehouseStatement($storehouse_id){
 
-  $storehouse = storehouseModel::findOrFail($storehouse_id);
+    public function storehouseStatement($storehouse_id){
 
-  $WarehouseItems = Warehouse_purchasesModel::where('storehouses_id', $storehouse_id)
-    ->select('purchase_date as date', 'total_amount as amount')
-    ->get()
-    ->map(function ($item) {
-        return [
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'فاتورة شراء',
-            'balance' => null,
-            
-        ];
-    });
+        $storehouse = storehouseModel::findOrFail($storehouse_id);
 
-  $paymentItems = Warehouse_paymentsModel::where('storehouses_id', $storehouse_id)
-    ->select('payment_date as date', 'total as amount')
-    ->get()
-    ->map(function ($item) {
-        return [
-            'date' => $item->date,
-            'amount' => $item->amount,
-            'type' => 'دفعة',
-            'balance' => null
-            
-        ];
-    });
+        $WarehouseItems = Warehouse_purchasesModel::where('storehouses_id', $storehouse_id)
+            ->select('purchase_date as date', 'total_amount as amount')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'amount' => $item->amount,
+                    'type' => 'فاتورة شراء',
+                    'balance' => null,
+                    
+                ];
+            });
 
-  // دمج وترتيب حسب التاريخ
-  $statement = $WarehouseItems->merge($paymentItems)->sortBy('date')->values();
+        $paymentItems = Warehouse_paymentsModel::where('storehouses_id', $storehouse_id)
+            ->select('payment_date as date', 'total as amount')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'amount' => $item->amount,
+                    'type' => 'دفعة',
+                    'balance' => null
+                    
+                ];
+            });
 
-  // حساب الرصيد
-  $balance = 0;
-  
-$statement = $statement->map(function ($item) use (&$balance) {
-    if ($item['type'] == 'فاتورة شراء') {
-        $balance -= $item['amount'];
-    } else {
-        $balance += $item['amount'];
+        // دمج وترتيب حسب التاريخ
+        $statement = $WarehouseItems->merge($paymentItems)->sortBy('date')->values();
+
+        // حساب الرصيد
+        $balance = 0;
+        
+        $statement = $statement->map(function ($item) use (&$balance) {
+            if ($item['type'] == 'فاتورة شراء') {
+                $balance -= $item['amount'];
+            } else {
+                $balance += $item['amount'];
+            }
+
+            $item['balance'] = $balance;
+            return $item;
+        });
+
+        return view('Admin.storehouse.statement', compact('statement', 'balance', 'storehouse'));
     }
-
-    $item['balance'] = $balance;
-    return $item;
-});
-
-   return view('Admin.storehouse.statement', compact('statement', 'balance', 'storehouse'));
-}
 }

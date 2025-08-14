@@ -10,11 +10,14 @@ use App\Models\patient_PaymentModel;
 use App\Models\Warehouse_paymentsModel;
 use App\Models\Warehouse_purchasesModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class financial_ReportController extends Controller
 {
-public function getReport(Request $request)
-    {   
+    public function getReport(Request $request){
+      try {
+        return DB::transaction(function () use ($request) {   
         $from = $request->query('from', date('Y-m-d'));
         $to = $request->query('to', date('Y-m-d'));
 
@@ -53,7 +56,7 @@ public function getReport(Request $request)
 
         //الديون لنا
         $session = Clinic_SessionsModel::whereBetween('session_date', [$from, $to])->sum('remaining_amount');
-    $debts_to_us2 =$session - ($patient_cash_payment + $patient_card_payment);
+        $debts_to_us2 =$session - ($patient_cash_payment + $patient_card_payment);
 
         //الديون علينا
         $total_pay = $lab_payments_cash + $warehouse_payments_cash+$lab_payments_card + $warehouse_payments_card;
@@ -63,49 +66,38 @@ public function getReport(Request $request)
         $debts_to_have2 =$total_purchases - $total_pay;
 
 
-        // $debts_to_have2=0;
-        // $debts_to_us2=0;
-
-        // if($debts_to_us < 0){
-        //     $debts_to_have2 = abs($debts_to_us);    
-        // }else{
-        //     $debts_to_us2 = abs($debts_to_us);
-        // }
-        // if($debts_to_have < 0){
-        //     $debts_to_us2 = abs($debts_to_have);
-        // }else{
-        //     $debts_to_have2 = abs($debts_to_have);
-        // }
+        
         $profit_cash = $cash_revenue - $cash_expenses;
- $profit_card = $card_revenue - $card_expenses;
+        $profit_card = $card_revenue - $card_expenses;
 
- $total_profit = $profit_cash + $profit_card;
- //الربح بعد تحصيل الديون
- $true_total_profit = $total_profit + $debts_to_us2 - $debts_to_have2;
+        $total_profit = $profit_cash + $profit_card;
+        //الربح بعد تحصيل الديون
+        $true_total_profit = $total_profit + $debts_to_us2 - $debts_to_have2;
 
         $cash_box= $cash_revenue - $cash_expenses;
         $card_box= $card_revenue - $card_expenses;
-    return view('admin.reports.index', [
-    'cash_revenue' => $cash_revenue,
-    'card_revenue' => $card_revenue,
-    'cash_expenses' => $cash_expenses,
-    'card_expenses' => $card_expenses,
-    'debts_to_us' => $debts_to_us2,
-    'debts_to_have' => $debts_to_have2,
-    'cash_box' => $cash_box,
-    'card_box' => $card_box,
-    'true_total_profit' => $true_total_profit,
- ]);
-        // return response()->json([
-        //     'cash_revenue' => $cash_revenue,
-        //     'card_revenue' => $card_revenue,
-        //     'cash_expenses' => $cash_expenses,
-        //     'card_expenses' => $card_expenses,
-        //     'debts_to_us' => $debts_to_us2,
-        //     'debts_to_have' => $debts_to_have2,
-        //     'cash_box' => $cash_box,
-        //     'card_box' => $card_box,
-        // ])->setStatusCode(200);
+
+        return view('admin.reports.index', [
+        'cash_revenue' => $cash_revenue,
+        'card_revenue' => $card_revenue,
+        'cash_expenses' => $cash_expenses,
+        'card_expenses' => $card_expenses,
+        'debts_to_us' => $debts_to_us2,
+        'debts_to_have' => $debts_to_have2,
+        'cash_box' => $cash_box,
+        'card_box' => $card_box,
+        'true_total_profit' => $true_total_profit,
+        ]);
+        });
+      }  catch (\Throwable $e) {
+        // تسجيل الخطأ في لوج لارافيل
+        Log::error('Error generating report: ' . $e->getMessage());
+
+        // عرض صفحة خطأ للمستخدم أو رسالة مناسبة
+        return back()->with('error', 'حدث خطأ أثناء إنشاء التقرير، حاول مرة أخرى.');
+    }
+
+        
     }       
 
 
